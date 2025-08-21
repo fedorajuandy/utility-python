@@ -9,8 +9,7 @@ import json
 EXT_IMG = [".png", ".jpeg", ".jpg"]
 
 
-
-def make_folder(folder_path: str):
+def create_folder(folder_path: str):
     """ Make folder if not exist """
 
     try:
@@ -41,30 +40,29 @@ def make_folder(folder_path: str):
 def get_file_path(folder_path: str, file: str) -> str:
     """Get relative file path and return JSON string"""
 
+    if not os.path.exists(folder_path):
+        print(f"Folder {folder_path} not found.")
+        return json.dumps({
+            "status": 404,
+            "message": "Folder not found."
+        })
 
     try:
-        if not os.path.exists(folder_path):
-            print(f"Folder {folder_path} not found.")
+        full_path = os.path.join(folder_path, file)
+
+        if not os.path.exists(full_path):
+            print(f"\"{file}\" not found in \"{folder_path}\".")
             return json.dumps({
                 "status": 404,
-                "message": "Folder not found."
+                "message": "File not found."
             })
         else:
-            full_path = os.path.join(folder_path, file)
-
-            if not os.path.exists(full_path):
-                print(f"\"{file}\" not found in \"{folder_path}\".")
-                return json.dumps({
-                    "status": 404,
-                    "message": "File not found."
-                })
-            else:
-                print(f"Getting file location of: {file} in {folder_path}.")
-                return json.dumps({
-                    "status": 200,
-                    "message": "Success getting file.",
-                    "path": full_path
-                })
+            print(f"Getting file location of: {file} in {folder_path}.")
+            return json.dumps({
+                "status": 200,
+                "message": "Success getting file.",
+                "path": full_path
+            })
     except Exception as e:
         print(f"Error getting \"{file}\" in \"{folder_path}\": {e}.")
         return json.dumps({
@@ -116,7 +114,7 @@ def move_file(file: str, current_folder: str, destination_folder: str):
         })
 
     try:
-        make_folder(destination_folder)
+        create_folder(destination_folder)
 
         src = os.path.join(current_folder, file)
         dst = os.path.join(destination_folder, file)
@@ -154,7 +152,7 @@ def copy_file(file: str, current_folder: str, destination_folder: str):
         })
 
     try:
-        make_folder(destination_folder)
+        create_folder(destination_folder)
 
         src = os.path.join(current_folder, file)
         dst = os.path.join(destination_folder, file)
